@@ -24,7 +24,7 @@ void MaximumEngine::GameObject::render(SDL_Renderer* renderer)
 	//Render components
 	for (int i = 0; i < components.size(); i++)
 	{
-		components[i]->render();
+		components[i]->render(renderer);
 	}
 }
 

@@ -63,6 +63,7 @@ void MaximumEngine::Geometry::rotate()
 }
 void MaximumEngine::Geometry::setRotation(float z) 
 {
+	float rotationChange = rotation - z;
 	rotation = z;
 	rotate();
 	setPoints();

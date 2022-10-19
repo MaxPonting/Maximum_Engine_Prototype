@@ -35,6 +35,7 @@ namespace MaximumEngine
 		//METHODS
 		void render(SDL_Renderer* renderer);	
 		void update();
+		void rotateComponents(float z);
 		//VARIABLES
 		std::vector<Component*> components;
 		//FRIENDS

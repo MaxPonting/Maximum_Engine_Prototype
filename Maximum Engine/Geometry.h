@@ -36,6 +36,7 @@ namespace MaximumEngine
 		//FRIENDS
 		friend class GameObject;
 		friend class Collider;
+		friend class PolygonCollider;
 	};
 }
 

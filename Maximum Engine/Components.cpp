@@ -26,22 +26,14 @@ MaximumEngine::Geometry* MaximumEngine::Component::getGeometry()
 void MaximumEngine::Collider::update()
 {
 	//Check which colliders are close
-	std::vector<Collider*> closeColliders;
-	for (int i = 0; i < ME_ENGINE_COLLIDERS.size(); i++)
-	{
-		float distance = (getGeometry()->position - ME_ENGINE_COLLIDERS[i]->getGeometry()->position).getMagnitude();
-		if((distance < getGeometry()->getLargestVertice() + ME_ENGINE_COLLIDERS[i]->getGeometry()->getLargestVertice()) && this != ME_ENGINE_COLLIDERS[i])
-		{
-			closeColliders.push_back(ME_ENGINE_COLLIDERS[i]);
-		}
-	}
+	std::vector<Collider*> closeColliders = getCloseColliders();
 	bool collision = false;
 	//Check line intersection with colliders
-	std::vector<Vector2> vertices1 = getGeometry()->rotatedVertices;
+	std::vector<Vector2> vertices1 = getVertices();
 	std::vector<Vector2> vertices2;
 	for (int i = 0; i < closeColliders.size(); i++)
 	{
-		vertices2 = closeColliders[i]->getGeometry()->rotatedVertices;
+		vertices2 = closeColliders[i]->getVertices();
 		int j1 = vertices1.size() - 1;
 		for (int c1 = 0; c1 < vertices1.size(); c1++)
 		{
@@ -54,9 +46,8 @@ void MaximumEngine::Collider::update()
 				Vector2 point4 = closeColliders[i]->getGeometry()->position + vertices2[c2];
 				if (doIntersect(point1, point2, point3, point4))
 				{
-					getGeometry()->colour = { 255, 0, 0, 255 };
 					collision = true;
-					alertScripts(closeColliders[i]);
+					alertComponents(closeColliders[i]);
 					break;
 				}
 				j2 = c2;
@@ -65,19 +56,43 @@ void MaximumEngine::Collider::update()
 			if (collision) { break; }
 		}
 	}
-	if(!collision) { getGeometry()->colour = { 0, 255, 0, 255 }; }
 }
-void MaximumEngine::Collider::alertScripts(Collider* collider)
+void MaximumEngine::Collider::render(SDL_Renderer* renderer)
+{
+	//Return if renderOutline is false
+	if (!renderOutline) { return; }
+	//Render Outline Of Collider in Green
+	SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+	std::vector<Vector2> vertices = getVertices();
+	Vector2 position = getGeometry()->position;
+	int j = vertices.size() - 1;
+	for (int i = 0; i < vertices.size(); i++)
+	{
+		//Render lines
+		SDL_RenderDrawLine(renderer, vertices[j].x + position.x, vertices[j].y + position.y, vertices[i].x + position.x, vertices[i].y + position.y);
+		j = i;
+	}
+}
+void MaximumEngine::Collider::alertComponents(Collider* collider)
 {
 	std::vector<Component*> components = getGameObject()->components;
 	for (int i = 0; i < components.size(); i++)
 	{
-		if (dynamic_cast<Script*>(components[i]) != nullptr)
+		components[i]->onCollision(collider);
+	}
+}
+std::vector<MaximumEngine::Collider*> MaximumEngine::Collider::getCloseColliders()
+{
+	std::vector<Collider*> closeColliders;
+	for (int i = 0; i < ME_ENGINE_COLLIDERS.size(); i++)
+	{
+		float distance = (getGeometry()->position - ME_ENGINE_COLLIDERS[i]->getGeometry()->position).getMagnitude();
+		if ((distance < getLargestVertice() + ME_ENGINE_COLLIDERS[i]->getLargestVertice()) && this != ME_ENGINE_COLLIDERS[i])
 		{
-			Script* script = (Script*)(components[i]);
-			script->onCollision(collider);
+			closeColliders.push_back(ME_ENGINE_COLLIDERS[i]);
 		}
 	}
+	return closeColliders;
 }
 bool MaximumEngine::Collider::doIntersect(Vector2 p1, Vector2 q1, Vector2 p2, Vector2 q2)
 {
@@ -99,8 +114,7 @@ bool MaximumEngine::Collider::doIntersect(Vector2 p1, Vector2 q1, Vector2 p2, Ve
 }
 int MaximumEngine::Collider::lineOrientation(Vector2 p, Vector2 q, Vector2 r)
 {
-	int val = (q.y - p.y) * (r.x - q.x) -
-		(q.x - p.x) * (r.y - q.y);
+	int val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
 
 	if (val == 0) return 0;
 
@@ -112,4 +126,82 @@ bool MaximumEngine::Collider::onLineSegment(Vector2 p, Vector2 q, Vector2 r)
 		q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y)) return true;
 
 	return false;
+}
+//Getters
+std::vector<ME_Vector2> MaximumEngine::Collider::getVertices()
+{
+	return getGeometry()->rotatedVertices;
+}
+float MaximumEngine::Collider::getLargestVertice()
+{
+	return getGeometry()->getLargestVertice();
+}
+
+//POLYGON COLLIDER
+//Methods
+void MaximumEngine::PolygonCollider::start()
+{
+	//Set default vertices to match geometry
+	vertices = getGeometry()->rotatedVertices;
+}
+void MaximumEngine::PolygonCollider::rotate(float z)
+{
+	rotatedVertices.clear();
+	//Rotate each vertice
+	for (int i = 0; i < vertices.size(); i++)
+	{
+		Vector2 rotatedVector;
+		rotatedVector.x = vertices[i].x * cos(rotation) - sin(rotation) * vertices[i].y;
+		rotatedVector.y = vertices[i].x * sin(rotation) + cos(rotation) * vertices[i].y;
+		rotatedVertices.push_back(rotatedVector);
+	}
+}
+//Getters
+std::vector<ME_Vector2> MaximumEngine::PolygonCollider::getVertices()
+{
+	return vertices;
+}
+float MaximumEngine::PolygonCollider::getLargestVertice()
+{
+	float largest = 0;
+	for (int i = 0; i < vertices.size(); i++)
+	{
+		float current = vertices[i].getMagnitude();
+		if (current > largest)
+		{
+			largest = current;
+		}
+	}
+	return largest;
+}
+//Setters
+void MaximumEngine::PolygonCollider::setVertices(std::vector<Vector2> v)
+{
+	vertices = v;
+}
+
+//CIRCLE COLLIDER
+//Methods
+void MaximumEngine::CircleCollider::update()
+{
+	//Check which colliders are close
+	std::vector<Collider*> closeColliders = getCloseColliders();
+	//Check type of colliders
+	for (int i = 0; i < closeColliders.size(); i++)
+	{
+		//Call collision if collider is circle
+		if (dynamic_cast<CircleCollider*>(closeColliders[i]))
+		{
+			alertComponents(closeColliders[i]);
+		}
+		//Circle and Polygon Collision
+		else
+		{
+
+		}
+	}
+}
+float MaximumEngine::CircleCollider::getLargestVertice()
+{
+	return radius;
 }
