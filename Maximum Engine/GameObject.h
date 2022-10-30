@@ -11,9 +11,9 @@ namespace MaximumEngine
 {
 	class GameObject
 	{
-	public:
+	public:		
 		//CONSTRUCTOR
-		GameObject();			
+		GameObject();
 		//METHODS
 		//ECS
 		template <class T> T* addComponent()
@@ -24,7 +24,7 @@ namespace MaximumEngine
 			component->init(this, &geometry);
 			if (std::is_base_of<Collider, T>::value)
 			{
-				MaximumEngine::Engine::colliders.push_back((Collider*)component);
+				Engine::colliders.push_back((Collider*)component);
 			}
 			components.push_back(t);
 			return t;
@@ -34,13 +34,12 @@ namespace MaximumEngine
 	private:
 		//METHODS
 		void render(SDL_Renderer* renderer);	
-		void update();
+		void update(std::vector<Collider*> cols);
 		void rotateComponents(float z);
 		//VARIABLES
 		std::vector<Component*> components;
 		//FRIENDS
 		friend class Engine;
-		friend class Collider;
 	};
 }
 

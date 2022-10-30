@@ -59,13 +59,12 @@ void MaximumEngine::Engine::engineLoop()
 	SDL_Quit();
 }
 
-
 void MaximumEngine::Engine::update()
 {
-	//Call update in all GameObjects
-	for (int i = 0; i < gameObjects.size(); i++)
+	//Call update in all GameObjects	
+	for (int i = 0; i < gameObjects.size() - 1; i++)
 	{
-		gameObjects[i]->update();
+		gameObjects[i]->update(colliders);
 	}
 }
 
@@ -97,3 +96,4 @@ void MaximumEngine::Engine::events()
 		}
 	}
 }
+

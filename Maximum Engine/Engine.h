@@ -7,6 +7,7 @@
 #include "Time.h"
 #include "Input.h"
 #include "Components.h"
+#include "Collider.h"
 #include <vector>
 
 namespace MaximumEngine
@@ -32,10 +33,9 @@ namespace MaximumEngine
 		static EngineState engineState;
 		static std::vector<GameObject*> gameObjects;
 		static std::vector<Collider*> colliders;
-		//FRIENDS
-		friend class GameObject;
-		friend class Collider;
-		friend class CircleCollider;
+		//FRIEND FUNCTIONS
+		friend MaximumEngine::GameObject::GameObject();
+		template <class T> friend T* MaximumEngine::GameObject::addComponent();
 	};
 }
 
@@ -45,7 +45,7 @@ namespace MaximumEngine
 #define ME_Init() MaximumEngine::Engine::init()
 #define ME_Start() MaximumEngine::Engine::start()
 #define ME_Start_With_Resolution(w, h) MaximumEngine::Engine::start(w, h)
-//Variables
-#define ME_ENGINE_COLLIDERS MaximumEngine::Engine::colliders
+
+
 
 

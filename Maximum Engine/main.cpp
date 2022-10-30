@@ -1,4 +1,5 @@
 #include "Engine.h"
+#include <thread>
 
 class PlayerController : public MaximumEngine::Script
 {
@@ -42,6 +43,7 @@ int main(int argc, char* args[])
 
 	//Start Game
 	ME_Start_With_Resolution(1000, 800);
+
 	return 0;
 }
 

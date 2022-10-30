@@ -1,32 +1,12 @@
-#include "Engine.h"
-
-//COMPONENT
-//Methods
-void MaximumEngine::Component::init(GameObject* obj, Geometry* geo) 
-{
-	gameObject = obj;
-	geometry = geo;
-	start();
-}
-//Getters
-MaximumEngine::GameObject* MaximumEngine::Component::getGameObject()
-{
-	return gameObject;
-}
-MaximumEngine::Geometry* MaximumEngine::Component::getGeometry()
-{
-	return geometry;
-}
-
-//SCRIPT
-
+#include "Collider.h"
+#include "Geometry.h"
 
 //COLLIDER
 //Methods
-void MaximumEngine::Collider::update()
+void MaximumEngine::Collider::update(std::vector<Component*> comps, std::vector<Collider*> cols)
 {
 	//Check which colliders are close
-	std::vector<Collider*> closeColliders = getCloseColliders();
+	std::vector<Collider*> closeColliders = getCloseColliders(cols);
 	bool collision = false;
 	//Check line intersection with colliders
 	std::vector<Vector2> vertices1 = getVertices();
@@ -47,7 +27,7 @@ void MaximumEngine::Collider::update()
 				if (doIntersect(point1, point2, point3, point4))
 				{
 					collision = true;
-					alertComponents(closeColliders[i]);
+					alertComponents(closeColliders[i], comps);
 					break;
 				}
 				j2 = c2;
@@ -73,23 +53,22 @@ void MaximumEngine::Collider::render(SDL_Renderer* renderer)
 		j = i;
 	}
 }
-void MaximumEngine::Collider::alertComponents(Collider* collider)
+void MaximumEngine::Collider::alertComponents(Collider* collider, std::vector<Component*> comps)
 {
-	std::vector<Component*> components = getGameObject()->components;
-	for (int i = 0; i < components.size(); i++)
+	for (int i = 0; i < comps.size(); i++)
 	{
-		components[i]->onCollision(collider);
+		comps[i]->onCollision(collider);
 	}
 }
-std::vector<MaximumEngine::Collider*> MaximumEngine::Collider::getCloseColliders()
+std::vector<MaximumEngine::Collider*> MaximumEngine::Collider::getCloseColliders(std::vector<Collider*> cols)
 {
 	std::vector<Collider*> closeColliders;
-	for (int i = 0; i < ME_ENGINE_COLLIDERS.size(); i++)
+	for (int i = 0; i < cols.size(); i++)
 	{
-		float distance = (getGeometry()->position - ME_ENGINE_COLLIDERS[i]->getGeometry()->position).getMagnitude();
-		if ((distance < getLargestVertice() + ME_ENGINE_COLLIDERS[i]->getLargestVertice()) && this != ME_ENGINE_COLLIDERS[i])
+		float distance = (getGeometry()->position - cols[i]->getGeometry()->position).getMagnitude();
+		if ((distance < getLargestVertice() + cols[i]->getLargestVertice()) && this != cols[i])
 		{
-			closeColliders.push_back(ME_ENGINE_COLLIDERS[i]);
+			closeColliders.push_back(cols[i]);
 		}
 	}
 	return closeColliders;
@@ -182,17 +161,17 @@ void MaximumEngine::PolygonCollider::setVertices(std::vector<Vector2> v)
 
 //CIRCLE COLLIDER
 //Methods
-void MaximumEngine::CircleCollider::update()
+void MaximumEngine::CircleCollider::update(std::vector<Component*> comps, std::vector<Collider*> cols)
 {
 	//Check which colliders are close
-	std::vector<Collider*> closeColliders = getCloseColliders();
+	std::vector<Collider*> closeColliders = getCloseColliders(cols);
 	//Check type of colliders
 	for (int i = 0; i < closeColliders.size(); i++)
 	{
 		//Call collision if collider is circle
 		if (dynamic_cast<CircleCollider*>(closeColliders[i]))
 		{
-			alertComponents(closeColliders[i]);
+			alertComponents(closeColliders[i], comps);
 		}
 		//Circle and Polygon Collision
 		else

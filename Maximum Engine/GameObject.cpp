@@ -5,15 +5,19 @@
 //CONSTRUCTORS
 MaximumEngine::GameObject::GameObject() :geometry(Geometry()) 
 {
-	ME_Engine::gameObjects.push_back(this);
+	Engine::gameObjects.push_back(this);
 }
 
 //METHODS
-void MaximumEngine::GameObject::update()
+void MaximumEngine::GameObject::update(std::vector<Collider*> cols)
 {
 	//Update components
 	for (int i = 0; i < components.size(); i++)
 	{
+		if (dynamic_cast<Collider*>(components[i]))
+		{
+			components[i]->update(components, cols);
+		}
 		components[i]->update();
 	}
 }
