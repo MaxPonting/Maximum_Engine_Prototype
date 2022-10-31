@@ -84,7 +84,6 @@ void MaximumEngine::Geometry::setPoints()
 	points = Algorithm::fillPolygonThreaded(rotatedVertices);
 }
 
-
 //GETTERS
 float MaximumEngine::Geometry::getRotation()
 {

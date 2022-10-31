@@ -1,5 +1,6 @@
 #pragma once
 #include "SDL.h"
+#include <SDL_ttf.h>
 #include "Log.h"
 #include "GameObject.h"
 #include "Vector2.h"

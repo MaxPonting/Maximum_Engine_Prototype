@@ -1,5 +1,6 @@
 #include "Collider.h"
 #include "Geometry.h"
+#include "Algorithm.h"
 
 //COLLIDER
 //Methods
@@ -13,27 +14,10 @@ void MaximumEngine::Collider::update(std::vector<Component*> comps, std::vector<
 	std::vector<Vector2> vertices2;
 	for (int i = 0; i < closeColliders.size(); i++)
 	{
-		vertices2 = closeColliders[i]->getVertices();
-		int j1 = vertices1.size() - 1;
-		for (int c1 = 0; c1 < vertices1.size(); c1++)
+		//Check if a collison occurs with each collider
+		if (Algorithm::isCollisionPolygon(vertices1, closeColliders[i]->getGeometry()->vertices, getGeometry()->position, closeColliders[i]->getGeometry()->position))
 		{
-			int j2 = vertices2.size() - 1;
-			for (int c2 = 0; c2 < vertices2.size(); c2++)
-			{
-				Vector2 point1 = getGeometry()->position + vertices1[j1];
-				Vector2 point2 = getGeometry()->position + vertices1[c1];
-				Vector2 point3 = closeColliders[i]->getGeometry()->position + vertices2[j2];
-				Vector2 point4 = closeColliders[i]->getGeometry()->position + vertices2[c2];
-				if (doIntersect(point1, point2, point3, point4))
-				{
-					collision = true;
-					alertComponents(closeColliders[i], comps);
-					break;
-				}
-				j2 = c2;
-			}
-			j1 = c1;
-			if (collision) { break; }
+			alertComponents(closeColliders[i], comps);
 		}
 	}
 }

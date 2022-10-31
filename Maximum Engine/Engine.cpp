@@ -1,4 +1,6 @@
 #include "Engine.h"
+#include "Debug.h"
+#include <thread>
 
 //INIT STATIC MEMBERS
 SDL_Renderer* MaximumEngine::Engine::renderer = NULL;
@@ -11,6 +13,8 @@ void MaximumEngine::Engine::init()
 {
 	//Load SDL2
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) { ME_Error_Log(SDL_GetError()); }
+	//Load TTF
+	if (TTF_Init() != 0) { ME_Error_Log(TTF_GetError()); }
 	//Set EngineState
 	engineState = Initialized;
 }
@@ -25,8 +29,11 @@ void MaximumEngine::Engine::start()
 	if (window == NULL) { ME_Error_Log(SDL_GetError()); }
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (renderer == NULL) { ME_Error_Log(SDL_GetError()); }
+
+	//Start debug
+	Debug::start();
 	
-	//Start loop
+	//Start engine loop
 	engineLoop();
 }
 
@@ -45,12 +52,26 @@ void MaximumEngine::Engine::engineLoop()
 	//Engine Loop
 	engineState = Running;
 	while (engineState == Running)
-	{		
-		Time::updateTime();
+	{				
+		//Events
 		events();
+
+		//Input
 		Input::updateInput();
+
+		//Misc Time
+		Time::updateMiscTime();
+
+		//Update
 		update();
+		Time::updateUpdateTime();
+
+		//Render
 		render();
+		Time::updateRenderTime();
+
+		//Overall Time
+		Time::updateOverallTime();
 	}
 
 	//Clean up
@@ -61,6 +82,9 @@ void MaximumEngine::Engine::engineLoop()
 
 void MaximumEngine::Engine::update()
 {
+	//Update debug
+	Debug::update();
+	
 	//Call update in all GameObjects	
 	for (int i = 0; i < gameObjects.size() - 1; i++)
 	{
@@ -73,8 +97,8 @@ void MaximumEngine::Engine::render()
 	SDL_SetRenderDrawColor(renderer, ME_Screen_Colour.getR(), ME_Screen_Colour.getG(), ME_Screen_Colour.getB(), ME_Screen_Colour.getA());
 	SDL_RenderClear(renderer);
 
-	//Render FPS
-	Time::logFPS();
+	//Render debug
+	Debug::render(renderer);
 
 	//Call render in all GameObjects
 	for (int i = 0; i < gameObjects.size(); i++)

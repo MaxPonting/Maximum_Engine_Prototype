@@ -19,7 +19,15 @@ MaximumEngine::Vector2 MaximumEngine::Vector2::operator+(Vector2 v)
 {
 	return Vector2(x + v.x, y + v.y);
 }
+MaximumEngine::Vector2 MaximumEngine::Vector2::operator+(const Vector2 v) const
+{
+	return Vector2(x + v.x, y + v.y);
+}
 MaximumEngine::Vector2 MaximumEngine::Vector2::operator-(Vector2 v)
+{
+	return Vector2(x - v.x, y - v.y);
+}
+MaximumEngine::Vector2 MaximumEngine::Vector2::operator-(const Vector2 v) const
 {
 	return Vector2(x - v.x, y - v.y);
 }

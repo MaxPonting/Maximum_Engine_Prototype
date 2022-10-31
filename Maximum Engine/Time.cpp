@@ -1,30 +1,65 @@
 #include "Time.h"
 #include "Log.h"
 
-uint32_t MaximumEngine::Time::delta = 0;
+uint32_t MaximumEngine::Time::deltaTime = 0;
 uint32_t MaximumEngine::Time::lastTickTime = 0;
+uint32_t MaximumEngine::Time::currentDeltaTime = 0;
+uint32_t MaximumEngine::Time::renderTime = 0;
+uint32_t MaximumEngine::Time::updateTime = 0;
+uint32_t MaximumEngine::Time::miscTime = 0;
 int MaximumEngine::Time::fps = 0;
-bool MaximumEngine::Time::showFPS = true;
 
 //METHODS
-void MaximumEngine::Time::updateTime()
+void MaximumEngine::Time::updateOverallTime()
 {
 	uint32_t tickTime = SDL_GetTicks();
-	delta = tickTime - lastTickTime;
+	deltaTime = tickTime - lastTickTime;
 	lastTickTime = tickTime;
-	if (delta != 0) { fps = 1000 / delta; }
+	if (deltaTime != 0) { fps = 1000 / deltaTime; }
 	else { fps = 1000; }
-	
 }
-void MaximumEngine::Time::logFPS()
+void MaximumEngine::Time::updateMiscTime()
 {
-	if (!showFPS) { return; }
-	std::cout << "[Maximum Engine][FPS] " << fps << std::endl;
+	uint32_t timeTaken = SDL_GetTicks() - lastTickTime;
+	miscTime = timeTaken;
+	currentDeltaTime = timeTaken;
+}
+void MaximumEngine::Time::updateUpdateTime()
+{
+	uint32_t timeTaken = SDL_GetTicks() - lastTickTime - currentDeltaTime;
+	updateTime = timeTaken;
+	currentDeltaTime += timeTaken;
+}
+void MaximumEngine::Time::updateRenderTime()
+{
+	uint32_t timeTaken = SDL_GetTicks() - lastTickTime - currentDeltaTime;
+	renderTime = timeTaken;
+	currentDeltaTime += timeTaken;
 }
 
 //GETTERS
-double MaximumEngine::Time::getDeltaTime()
+float MaximumEngine::Time::getDeltaTimeSeconds()
 {
-	return (double)delta / 1000;
+	return (float)deltaTime / 1000;
+}
+uint32_t MaximumEngine::Time::getDeltaTimeMilliSeconds()
+{
+	return deltaTime;
+}
+int MaximumEngine::Time::getFps()
+{
+	return fps;
+}
+uint32_t MaximumEngine::Time::getMiscTime()
+{
+	return miscTime;
+}
+uint32_t MaximumEngine::Time::getUpdateTime()
+{
+	return updateTime;
+}
+uint32_t MaximumEngine::Time::getRenderTime()
+{
+	return renderTime;
 }
 

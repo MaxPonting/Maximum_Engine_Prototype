@@ -11,7 +11,9 @@ namespace MaximumEngine
 		bool operator==(Vector2 v);
 		bool operator!=(Vector2 v);
 		Vector2 operator+(Vector2 v);
+		Vector2 operator+(const Vector2 v) const;
 		Vector2 operator-(Vector2 v);
+		Vector2 operator-(const Vector2 v) const;
 		//METHODS
 		float getMagnitude();
 		//VARIABLES

@@ -3,7 +3,8 @@
 #include <thread>
 #include <future>
 
-//POLYGON FILL NO THREADS
+//POLYGON FILLING
+//No threads
 std::vector<ME_Vector2> MaximumEngine::Algorithm::fillPolygon(std::vector<Vector2> verts)
 {
 	std::vector<Vector2> points;
@@ -56,8 +57,7 @@ std::vector<ME_Vector2> MaximumEngine::Algorithm::fillPolygon(std::vector<Vector
 
 	return points;
 }
-
-//POLYGON FILL WITH THREADS
+//Theads
 std::vector<ME_Vector2> MaximumEngine::Algorithm::fillPolygonThreaded(std::vector<Vector2> verts)
 {
 	std::vector<Vector2> points;
@@ -124,8 +124,7 @@ std::vector<ME_Vector2> MaximumEngine::Algorithm::fillPolygonThreaded(std::vecto
 
 	return points;
 }
-
-//SCANLINE
+//Scanline
 std::vector<ME_Vector2> MaximumEngine::Algorithm::scanline(std::vector<Vector2> verts, float yMin, float yMax, float xMin, float xMax)
 {
 	std::vector<Vector2> points;
@@ -218,3 +217,71 @@ std::vector<ME_Vector2> MaximumEngine::Algorithm::scanline(std::vector<Vector2> 
 	return points;
 }
 
+//COLLISION DETECTION
+bool MaximumEngine::Algorithm::isCollisionPolygon(const std::vector<Vector2> verts1, const std::vector<Vector2> verts2, const Vector2 p1, const Vector2 p2)
+{
+	//Checks if any edges intersect
+	int j1 = verts1.size() - 1;
+	for (int c1 = 0; c1 < verts1.size(); c1++)
+	{
+		int j2 = verts2.size() - 1;
+		for (int c2 = 0; c2 < verts2.size(); c2++)
+		{
+			Vector2 point1 = p1 + verts1[j1];
+			Vector2 point2 = p1 + verts1[c1];
+			Vector2 point3 = p2 + verts2[j2];
+			Vector2 point4 = p2 + verts2[c2];
+			if (isIntersect(point1, point2, point3, point4))
+			{
+				return true;
+			}
+			j2 = c2;
+		}
+		j1 = c1;
+	}
+	return false;
+	//Time Complexity O(n^2)
+}
+bool MaximumEngine::Algorithm::isCollisionPolygonRectangle(const float height, const float width, const std::vector<Vector2> vertices) { return false; }
+bool MaximumEngine::Algorithm::isCollisionPolygonSquare(const float size, const std::vector<Vector2> vertices) { return false; }
+bool MaximumEngine::Algorithm::isCollisionPolygonCircle(const float radius, const std::vector<Vector2> vertices) { return false; }
+bool MaximumEngine::Algorithm::isCollisionRectangle(const float height1, const float width1, const float height2, const float width2) { return false; }
+bool MaximumEngine::Algorithm::isCollisionRectangleSquare(const float height, const float width, const float size) { return false; }
+bool MaximumEngine::Algorithm::isCollisionRectangleCircle(const float height, const float width, const float radius) { return false; }
+bool MaximumEngine::Algorithm::isCollisionSquare(const float size1, const float size2) { return false; }
+bool MaximumEngine::Algorithm::isCollisionSquareCircle(const float size, const float radius) { return false; }
+
+//POINT LINE INTERSECTION
+bool MaximumEngine::Algorithm::isIntersect(Vector2 p1, Vector2 q1, Vector2 p2, Vector2 q2)
+{
+	int o1 = getLineOrientation(p1, q1, p2);
+	int o2 = getLineOrientation(p1, q1, q2);
+	int o3 = getLineOrientation(p2, q2, p1);
+	int o4 = getLineOrientation(p2, q2, q1);
+
+	//General Case
+	if (o1 != o2 && o3 != o4) return true;
+
+	//Special Cases
+	if (o1 == 0 && onLineSegment(p1, p2, q1)) return true;
+	if (o2 == 0 && onLineSegment(p1, q2, q1)) return true;
+	if (o3 == 0 && onLineSegment(p2, p1, q2)) return true;
+	if (o4 == 0 && onLineSegment(p2, q1, q2)) return true;
+
+	return false;
+}
+int MaximumEngine::Algorithm::getLineOrientation(Vector2 p, Vector2 q, Vector2 r)
+{
+	int val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+
+	if (val == 0) return 0;
+
+	return (val > 0) ? 1 : 2;
+}
+bool MaximumEngine::Algorithm::onLineSegment(Vector2 p, Vector2 q, Vector2 r)
+{
+	if (q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x) &&
+		q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y)) return true;
+
+	return false;
+}
