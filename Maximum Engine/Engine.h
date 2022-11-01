@@ -7,7 +7,7 @@
 #include "Screen.h"
 #include "Time.h"
 #include "Input.h"
-#include "Components.h"
+#include "Component.h"
 #include "Collider.h"
 #include <vector>
 

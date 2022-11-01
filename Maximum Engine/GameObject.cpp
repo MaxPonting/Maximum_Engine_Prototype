@@ -32,5 +32,17 @@ void MaximumEngine::GameObject::render(SDL_Renderer* renderer)
 	}
 }
 
+//SETTERS
+void MaximumEngine::GameObject::setGeometry(const Geometry g)
+{
+	geometry = g;
+}
+
+//GETTERS
+const ME_Geometry& MaximumEngine::GameObject::getGeometry()
+{
+	return geometry;
+}
+
 
 

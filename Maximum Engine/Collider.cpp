@@ -15,7 +15,7 @@ void MaximumEngine::Collider::update(std::vector<Component*> comps, std::vector<
 	for (int i = 0; i < closeColliders.size(); i++)
 	{
 		//Check if a collison occurs with each collider
-		if (Algorithm::isCollisionPolygon(vertices1, closeColliders[i]->getGeometry()->vertices, getGeometry()->position, closeColliders[i]->getGeometry()->position))
+		if (Algorithm::isCollisionPolygon(vertices1, closeColliders[i]->G_VERT, G_POS, closeColliders[i]->G_POS))
 		{
 			alertComponents(closeColliders[i], comps);
 		}
@@ -28,12 +28,11 @@ void MaximumEngine::Collider::render(SDL_Renderer* renderer)
 	//Render Outline Of Collider in Green
 	SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
 	std::vector<Vector2> vertices = getVertices();
-	Vector2 position = getGeometry()->position;
 	int j = vertices.size() - 1;
 	for (int i = 0; i < vertices.size(); i++)
 	{
 		//Render lines
-		SDL_RenderDrawLine(renderer, vertices[j].x + position.x, vertices[j].y + position.y, vertices[i].x + position.x, vertices[i].y + position.y);
+		SDL_RenderDrawLine(renderer, vertices[j].x + G_POS.x, vertices[j].y + G_POS.y, vertices[i].x + G_POS.x, vertices[i].y + G_POS.y);
 		j = i;
 	}
 }
@@ -49,7 +48,7 @@ std::vector<MaximumEngine::Collider*> MaximumEngine::Collider::getCloseColliders
 	std::vector<Collider*> closeColliders;
 	for (int i = 0; i < cols.size(); i++)
 	{
-		float distance = (getGeometry()->position - cols[i]->getGeometry()->position).getMagnitude();
+		float distance = (G_POS - cols[i]->G_POS).getMagnitude();
 		if ((distance < getLargestVertice() + cols[i]->getLargestVertice()) && this != cols[i])
 		{
 			closeColliders.push_back(cols[i]);
@@ -93,11 +92,11 @@ bool MaximumEngine::Collider::onLineSegment(Vector2 p, Vector2 q, Vector2 r)
 //Getters
 std::vector<ME_Vector2> MaximumEngine::Collider::getVertices()
 {
-	return getGeometry()->rotatedVertices;
+	return getGeometry().getVertices();
 }
 float MaximumEngine::Collider::getLargestVertice()
 {
-	return getGeometry()->getLargestVertice();
+	return getGeometry().getLargestVertice();
 }
 
 //POLYGON COLLIDER
@@ -105,7 +104,7 @@ float MaximumEngine::Collider::getLargestVertice()
 void MaximumEngine::PolygonCollider::start()
 {
 	//Set default vertices to match geometry
-	vertices = getGeometry()->rotatedVertices;
+	vertices = getGeometry().getVertices();
 }
 void MaximumEngine::PolygonCollider::rotate(float z)
 {

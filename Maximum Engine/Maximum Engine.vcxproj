@@ -175,7 +175,6 @@
     <ClInclude Include="Collider.h" />
     <ClInclude Include="Colour.h" />
     <ClInclude Include="Component.h" />
-    <ClInclude Include="Components.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="GameObject.h" />

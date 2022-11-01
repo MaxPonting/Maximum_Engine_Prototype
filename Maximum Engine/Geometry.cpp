@@ -63,19 +63,6 @@ void MaximumEngine::Geometry::rotate()
 		rotatedVertices.push_back(rotatedVector);
 	}
 }
-void MaximumEngine::Geometry::setRotation(float z) 
-{
-	float rotationChange = rotation - z;
-	rotation = z;
-	rotate();
-	setPoints();
-}
-void MaximumEngine::Geometry::setVertices(std::vector<Vector2> v)
-{
-	vertices = v;
-	rotate();
-	setPoints();
-}
 void MaximumEngine::Geometry::setPoints()
 {
 	//No Threading
@@ -85,11 +72,11 @@ void MaximumEngine::Geometry::setPoints()
 }
 
 //GETTERS
-float MaximumEngine::Geometry::getRotation()
+float MaximumEngine::Geometry::getRotation() const
 {
 	return rotation;
 }
-float MaximumEngine::Geometry::getLargestVertice()
+float MaximumEngine::Geometry::getLargestVertice() const
 {
 	float largest = 0;
 	for (int i = 0; i < vertices.size(); i++)
@@ -101,5 +88,40 @@ float MaximumEngine::Geometry::getLargestVertice()
 		}
 	}
 	return largest;
+}
+ME_Vector2 MaximumEngine::Geometry::getPosition() const
+{
+	return position;
+}
+std::vector<ME_Vector2> MaximumEngine::Geometry::getVertices() const
+{
+	return rotatedVertices;
+}
+std::vector<ME_Vector2> MaximumEngine::Geometry::getRawVertices() const
+{
+	return vertices;
+}
+
+//SETTERS
+void MaximumEngine::Geometry::setPosition(const Vector2 p) 
+{
+	position = p;
+}
+void MaximumEngine::Geometry::setVertices(const std::vector<Vector2> verts) 
+{
+	vertices = verts;
+	rotate();
+	setPoints();
+}
+void MaximumEngine::Geometry::setRotation(const float z)
+{
+	float rotationChange = rotation - z;
+	rotation = z;
+	rotate();
+	setPoints();
+}
+void MaximumEngine::Geometry::setColour(const Colour c)
+{
+	colour = c;
 }
 

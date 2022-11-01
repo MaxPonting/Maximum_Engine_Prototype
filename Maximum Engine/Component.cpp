@@ -10,13 +10,22 @@ void MaximumEngine::Component::init(GameObject* obj, Geometry* geo)
 	start();
 }
 //Getters
-MaximumEngine::GameObject* MaximumEngine::Component::getGameObject()
+const MaximumEngine::GameObject& MaximumEngine::Component::getGameObject()
 {
-	return gameObject;
+	return *gameObject;
 }
-MaximumEngine::Geometry* MaximumEngine::Component::getGeometry()
+const MaximumEngine::Geometry& MaximumEngine::Component::getGeometry()
 {
-	return geometry;
+	return *geometry;
+}
+//Geometry access
+void MaximumEngine::Component::setGPosition(const Vector2 pos)
+{
+	geometry->setPosition(pos);
+}
+void MaximumEngine::Component::setGRotation(const float z)
+{
+	geometry->setRotation(z);
 }
 
 //SCRIPT

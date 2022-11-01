@@ -33,7 +33,7 @@ MaximumEngine::Vector2 MaximumEngine::Vector2::operator-(const Vector2 v) const
 }
 
 //METHODS
-float MaximumEngine::Vector2::getMagnitude()
+float MaximumEngine::Vector2::getMagnitude() const
 {
 	return sqrt(pow(x, 2) + pow(y, 2));
 }

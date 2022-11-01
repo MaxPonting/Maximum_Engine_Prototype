@@ -15,7 +15,7 @@ namespace MaximumEngine
 		Vector2 operator-(Vector2 v);
 		Vector2 operator-(const Vector2 v) const;
 		//METHODS
-		float getMagnitude();
+		float getMagnitude() const;
 		//VARIABLES
 		float x, y;
 	};

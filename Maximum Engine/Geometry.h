@@ -14,15 +14,17 @@ namespace MaximumEngine
 		//CONSTRUCTOR
 		Geometry();
 		Geometry(std::vector<Vector2> vertices, Vector2 pos);
-		//METHODS
-		void setRotation(float z);
-		void setVertices(std::vector<Vector2> v);
 		//GETTERS
-		float getRotation();
-		float getLargestVertice();
-		//VARIABLES
-		Vector2 position;
-		Colour colour;
+		float getRotation() const;
+		Vector2 getPosition() const;
+		float getLargestVertice() const;
+		std::vector<Vector2> getVertices() const;
+		std::vector<Vector2> getRawVertices() const;
+		//SETTERS
+		void setPosition(const Vector2 p);	
+		void setColour(const Colour c);
+		void setVertices(const std::vector<Vector2> verts);
+		void setRotation(const float z);
 	private:
 		//METHODS
 		void render(SDL_Renderer* renderer);		
@@ -33,10 +35,10 @@ namespace MaximumEngine
 		std::vector<Vector2> rotatedVertices;
 		std::vector<Vector2> points;
 		float rotation;	
+		Vector2 position;
+		Colour colour;
 		//FRIENDS
 		friend class GameObject;
-		friend class Collider;
-		friend class PolygonCollider;
 	};
 }
 

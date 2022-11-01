@@ -3,7 +3,8 @@
 #include <bitset>
 #include "Geometry.h"
 #include "Vector2.h"
-#include "Components.h"
+#include "Component.h"
+#include "Collider.h"
 
 #define MAX_COMPONENTS 12
 
@@ -29,14 +30,17 @@ namespace MaximumEngine
 			components.push_back(t);
 			return t;
 		}
-		//VARIABLES
-		Geometry geometry;		
+	    //GETTERS
+		const Geometry& getGeometry();
+		//SETTERS
+		void setGeometry(const Geometry);
 	private:
 		//METHODS
 		void render(SDL_Renderer* renderer);	
 		void update(std::vector<Collider*> cols);
 		void rotateComponents(float z);
 		//VARIABLES
+		Geometry geometry;
 		std::vector<Component*> components;
 		//FRIENDS
 		friend class Engine;

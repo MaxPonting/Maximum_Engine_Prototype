@@ -14,8 +14,8 @@ namespace MaximumEngine
 	{
 	public:
 		//GETTERS
-		GameObject* getGameObject();
-		Geometry* getGeometry();
+		const GameObject& getGameObject();
+		const Geometry& getGeometry();
 	protected:
 		//METHODS		
 		void virtual init(GameObject* obj, Geometry* geo);
@@ -25,6 +25,10 @@ namespace MaximumEngine
 		void virtual render(SDL_Renderer* renderer) {}		
 		void virtual onCollision(Collider* collider) {}
 		void virtual rotate(float z) {};
+		//ACCESS TO GEOMETRY
+		//Setters
+		void setGPosition(const Vector2 pos);
+		void setGRotation(const float z);
 		//VARIABLES
 		float rotation;		
 	private:
@@ -42,5 +46,11 @@ namespace MaximumEngine
 
 	};
 }
+
+//SCRIPTING MACROS
+#define G_POS MaximumEngine::Component::getGeometry().getPosition()
+#define G_ROT MaximumEngine::Component::getGeometry().getRotation()
+#define G_VERT MaximumEngine::Component::getGeometry().getVertices()
+#define G_RAW_VERT MaximumEngine::Component::getGeometry().getRawVertices()
 
 
