@@ -1,5 +1,6 @@
 #pragma once
 #include "SDL.h"
+#include <chrono>
 
 namespace MaximumEngine
 {
@@ -8,10 +9,10 @@ namespace MaximumEngine
 	public:		
 		//GETTERS
 		static float getDeltaTimeSeconds();
-		static uint32_t getDeltaTimeMilliSeconds();
-		static uint32_t getMiscTime();
-		static uint32_t getRenderTime();
-		static uint32_t getUpdateTime();
+		static float getDeltaTimeMilliSeconds();
+		static float getMiscTime();
+		static float getRenderTime();
+		static float getUpdateTime();
 		static int getFps();
 	private:
 		//METHODS
@@ -20,12 +21,12 @@ namespace MaximumEngine
 		static void updateUpdateTime();
 		static void updateMiscTime();
 		//VARIABLES
-		static uint32_t lastTickTime;
-		static uint32_t currentDeltaTime;
-		static uint32_t renderTime;
-		static uint32_t updateTime;
-		static uint32_t miscTime;
-		static uint32_t deltaTime;
+		static std::chrono::time_point<std::chrono::high_resolution_clock> lastTickTime;
+		static float currentDeltaTime;
+		static float renderTime;
+		static float updateTime;
+		static float miscTime;
+		static float deltaTime;
 		static int fps;
 		//FRIENDS
 		friend class Engine;

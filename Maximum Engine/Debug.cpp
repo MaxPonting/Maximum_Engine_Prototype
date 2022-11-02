@@ -27,10 +27,10 @@ void MaximumEngine::Debug::update()
 	{
 		lastUpdateTime = 0;
 		fps_t.text = "FPS:" + std::to_string(MaximumEngine::Time::getFps());
-		delta_t.text = "Frame:" + std::to_string(MaximumEngine::Time::getDeltaTimeMilliSeconds()) + "ms";
-		update_t.text = "Update:" + std::to_string(MaximumEngine::Time::getUpdateTime()) + "ms";
-		render_t.text = "Render:" + std::to_string(MaximumEngine::Time::getRenderTime()) + "ms";
-		misc_t.text = "Misc:" + std::to_string(MaximumEngine::Time::getMiscTime()) + "ms";
+		delta_t.text = "Frame:" + std::to_string(MaximumEngine::Time::getDeltaTimeMilliSeconds()).substr(0, 5) + "ms";
+		update_t.text = "Update:" + std::to_string(MaximumEngine::Time::getUpdateTime()).substr(0, 5) + "ms";
+		render_t.text = "Render:" + std::to_string(MaximumEngine::Time::getRenderTime()).substr(0, 5) + "ms";
+		misc_t.text = "Misc:" + std::to_string(MaximumEngine::Time::getMiscTime()).substr(0, 5) + "ms";
 	}
 }
 

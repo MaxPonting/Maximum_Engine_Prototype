@@ -43,7 +43,7 @@ int main(int argc, char* args[])
 	object2.addComponent<MaximumEngine::Collider>()->renderOutline = true;
 
 	//Start Game
-	ME_Start_With_Resolution(1000, 800);
+	ME_Start_With_Resolution(1400, 800);
 
 	return 0;
 }
