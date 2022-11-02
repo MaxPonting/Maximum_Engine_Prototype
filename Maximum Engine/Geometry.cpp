@@ -66,9 +66,9 @@ void MaximumEngine::Geometry::rotate()
 void MaximumEngine::Geometry::setPoints()
 {
 	//No Threading
-	//points = Algorithm::fillPolygon(rotatedVertices);
+	points = Algorithm::fillPolygon(rotatedVertices);
 	//Threading
-	points = Algorithm::fillPolygonThreaded(rotatedVertices);
+	//points = Algorithm::fillPolygonThreaded(rotatedVertices);
 }
 
 //GETTERS
