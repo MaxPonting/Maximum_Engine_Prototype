@@ -21,10 +21,16 @@ void MaximumEngine::GameObject::update(std::vector<Collider*> cols)
 		components[i]->update();
 	}
 }
+void MaximumEngine::GameObject::updateGeometry()
+{
+	//Update geometry
+	geometry.update();
+}
 void MaximumEngine::GameObject::render(SDL_Renderer* renderer)
 {
 	//Render geometry
 	geometry.render(renderer);
+
 	//Render components
 	for (int i = 0; i < components.size(); i++)
 	{

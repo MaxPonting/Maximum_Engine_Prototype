@@ -11,12 +11,21 @@ std::vector<MaximumEngine::Collider*> MaximumEngine::Engine::colliders;
 
 void MaximumEngine::Engine::init() 
 {
+	if (engineState == Initialized) { ME_Error_Log("Engine already initialized!"); return; }
 	//Load SDL2
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) { ME_Error_Log(SDL_GetError()); }
 	//Load TTF
 	if (TTF_Init() != 0) { ME_Error_Log(TTF_GetError()); }
 	//Set EngineState
 	engineState = Initialized;
+}
+
+void MaximumEngine::Engine::initWithThreading()
+{
+	if (engineState == Initialized) { ME_Error_Log("Engine already initialized!"); return; }
+	init();
+	//Init Thread Pool
+	EngineThreadPool::init();
 }
 
 void MaximumEngine::Engine::start()
@@ -85,11 +94,20 @@ void MaximumEngine::Engine::update()
 	//Update debug
 	Debug::update();
 	
-	//Call update in all GameObjects	
-	for (int i = 0; i < gameObjects.size() - 1; i++)
+	//Update Gameobject components
+	for (int i = 0; i < gameObjects.size(); i++)
 	{
-		gameObjects[i]->update(colliders);
+		gameObjects[i]->update(colliders);		
 	}
+
+	//Update GameObject geometry
+	for (int i = 0; i < gameObjects.size(); i++)
+	{
+		gameObjects[i]->updateGeometry();
+	}
+
+	//Wait for threads
+	EngineThreadPool::wait();
 }
 
 void MaximumEngine::Engine::render()
@@ -97,14 +115,14 @@ void MaximumEngine::Engine::render()
 	SDL_SetRenderDrawColor(renderer, ME_Screen_Colour.getR(), ME_Screen_Colour.getG(), ME_Screen_Colour.getB(), ME_Screen_Colour.getA());
 	SDL_RenderClear(renderer);
 
-	//Render debug
-	Debug::render(renderer);
-
 	//Call render in all GameObjects
 	for (int i = 0; i < gameObjects.size(); i++)
 	{
 		gameObjects[i]->render(renderer);
 	}
+
+	//Render debug
+	Debug::render(renderer);
 
 	SDL_RenderPresent(renderer);
 }

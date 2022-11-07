@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector2.h"
+#include "Edge.h"
 #include <vector>
 
 namespace MaximumEngine
@@ -9,7 +10,7 @@ namespace MaximumEngine
 	public:
 		//Polygon Filling
 		static std::vector<Vector2> fillPolygon(const std::vector<Vector2> verts);
-		static std::vector<Vector2> fillPolygonThreaded(const std::vector<Vector2> verts);
+		static std::vector<Vector2> fillPolygonEdgeBucket(const std::vector<Vector2> verts);
 		//Collision Detection
 		static bool isCollisionPolygon(const std::vector<Vector2> verts1, const std::vector<Vector2> verts2, const Vector2 p1, const Vector2 p2);
 		static bool isCollisionPolygonRectangle(const float height, const float width, const std::vector<Vector2> vertices);

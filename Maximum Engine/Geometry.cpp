@@ -4,6 +4,7 @@
 #include "Log.h"
 #include "Screen.h"
 #include "Algorithm.h"
+#include "EngineThreadPool.h"
 
 
 //CONSTRUCTOR
@@ -18,14 +19,24 @@ MaximumEngine::Geometry::Geometry() :position(Vector2(10, 10)), rotation(0), col
 	//Set Rotated Vertices
 	rotatedVertices = vertices;
 	//Set Points
-	setPoints();
+	tsSetPoints();
 }
 MaximumEngine::Geometry::Geometry(std::vector<Vector2> vertices, Vector2 pos) :vertices(vertices), position(pos), rotatedVertices(vertices), rotation(0)
 { 
-	setPoints(); 
+	tsSetPoints(); 
 }
 
 //METHODS
+void MaximumEngine::Geometry::update()
+{
+	if (scanlineNeeded == true)
+	{
+		//Run scanline on thread
+		if (EngineThreadPool::enqueue([=] { tsSetPoints(); }));
+		else tsSetPoints();
+	}
+	scanlineNeeded = false;
+}
 void MaximumEngine::Geometry::render(SDL_Renderer* renderer)
 {
 	//Return if all vertices off screen
@@ -63,12 +74,9 @@ void MaximumEngine::Geometry::rotate()
 		rotatedVertices.push_back(rotatedVector);
 	}
 }
-void MaximumEngine::Geometry::setPoints()
+void MaximumEngine::Geometry::tsSetPoints()
 {
-	//No Threading
 	points = Algorithm::fillPolygon(rotatedVertices);
-	//Threading
-	//points = Algorithm::fillPolygonThreaded(rotatedVertices);
 }
 
 //GETTERS
@@ -111,14 +119,14 @@ void MaximumEngine::Geometry::setVertices(const std::vector<Vector2> verts)
 {
 	vertices = verts;
 	rotate();
-	setPoints();
+	scanlineNeeded = true;
 }
 void MaximumEngine::Geometry::setRotation(const float z)
 {
 	float rotationChange = rotation - z;
 	rotation = z;
 	rotate();
-	setPoints();
+	scanlineNeeded = true;
 }
 void MaximumEngine::Geometry::setColour(const Colour c)
 {

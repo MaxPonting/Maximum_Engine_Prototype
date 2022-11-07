@@ -16,34 +16,46 @@ protected:
 	}
 };
 
+class Rotator : public MaximumEngine::Script
+{
+protected:
+	void update()
+	{
+		setGRotation(G_ROT + 1 * ME_DELTA_TIME);
+	}
+};
+
 int main(int argc, char* args[])
 {
 	//Init Engine
+	//ME_Init_Threading();
 	ME_Init();
 
-	//Geometry
-	ME_Geometry geometry = ME_Geometry();
-	geometry.setPosition(ME_Vector2(200, 400));
-	geometry.setColour({ 255, 255, 255, 255 });
-	geometry.setVertices({ ME_Vector2(60, -140), ME_Vector2(20, -30),   ME_Vector2(80, 70),    ME_Vector2(130, 150),  ME_Vector2(70, 160),   ME_Vector2(20, 70),
-						   ME_Vector2(-30, 80),  ME_Vector2(-40, 110),  ME_Vector2(-56, 70),   ME_Vector2(-100, 100), ME_Vector2(-70, -110), ME_Vector2(-50, -120) });
+	//Create Objects	
+	
+	for (int posX = 100; posX < 1600; posX += 150)
+	{
+		for (int posY = 100; posY < 800; posY += 150)
+		{
+			ME_Geometry geometry = ME_Geometry({ ME_Geometry_Rectangle(100, 100) }, ME_Vector2(posX, posY));
+			geometry.setColour({ 255, 0, 255, 255 });
+			ME_GameObject* object = new ME_GameObject();
+			object->setGeometry(geometry);
+			object->addComponent<Rotator>();
+		}		
+	}
+	
 
-	//Create GameObject 1
-	ME_GameObject object = ME_GameObject();
-	object.setGeometry(geometry);
-	PlayerController* controller = object.addComponent<PlayerController>();
-	MaximumEngine::PolygonCollider* col = object.addComponent<MaximumEngine::PolygonCollider>();
-	col->renderOutline = true;
-
-	//Create GameObject 2
-	geometry = ME_Geometry({ ME_Geometry_Rectangle(200, 200) }, ME_Vector2(800, 300));
-	geometry.setColour({ 255, 255, 255, 255 });
-	ME_GameObject object2 = ME_GameObject();
-	object2.setGeometry(geometry);
-	object2.addComponent<MaximumEngine::Collider>()->renderOutline = true;
-
+	/*
+	ME_Geometry geometry = ME_Geometry({ ME_Geometry_Rectangle(100, 100) }, ME_Vector2(500, 400));
+	geometry.setColour({ 255, 0, 255, 255 });
+	ME_GameObject* object = new ME_GameObject();
+	object->setGeometry(geometry);
+	object->addComponent<Rotator>();
+	*/
+		
 	//Start Game
-	ME_Start_With_Resolution(1400, 800);
+	ME_Start_With_Resolution(1600, 800);
 
 	return 0;
 }

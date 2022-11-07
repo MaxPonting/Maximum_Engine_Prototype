@@ -2,7 +2,7 @@
 #include "Log.h"
 #include "Time.h"
 
-#define DEBUG_UPDATE_TIME 100
+#define DEBUG_UPDATE_TIME 50
 
 //STATIC VARIABLES
 TTF_Font* MaximumEngine::Debug::font = nullptr;

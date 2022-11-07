@@ -4,7 +4,6 @@
 #include <future>
 
 //POLYGON FILLING
-//No threads
 std::vector<ME_Vector2> MaximumEngine::Algorithm::fillPolygon(std::vector<Vector2> verts)
 {
 	std::vector<Vector2> points;
@@ -34,100 +33,6 @@ std::vector<ME_Vector2> MaximumEngine::Algorithm::fillPolygon(std::vector<Vector
 		}
 	}
 
-	//Run scanline
-	points = scanline(verts, yMin, yMax, xMin, xMax);
-
-	//Add horizontal outlines
-	int i = 0;
-	int j = verts.size() - 1;
-	float x1, x2, min, max;
-	for (i = 0; i < verts.size(); i++)
-	{
-		if ((verts[i].y == verts[j].y))
-		{
-			x1 = verts[i].x; x2 = verts[j].x;
-			min = std::min(x1, x2); max = std::max(x1, x2);
-			for (int x = min; x <= max; x++)
-			{
-				points.push_back(Vector2(x, verts[i].y));
-			}
-		}
-		j = i;
-	}
-
-	return points;
-}
-//Theads
-std::vector<ME_Vector2> MaximumEngine::Algorithm::fillPolygonThreaded(std::vector<Vector2> verts)
-{
-	std::vector<Vector2> points;
-
-	//Get max and min y
-	float yMax = verts[0].y;
-	float yMin = verts[0].y;
-	float xMax = verts[0].x;
-	float xMin = verts[0].x;
-	for (int i = 0; i < verts.size(); i++)
-	{
-		if (verts[i].y > yMax)
-		{
-			yMax = verts[i].y;
-		}
-		if (verts[i].y < yMin)
-		{
-			yMin = verts[i].y;
-		}
-		if (verts[i].x > xMax)
-		{
-			xMax = verts[i].x;
-		}
-		if (verts[i].x < xMin)
-		{
-			xMin = verts[i].x;
-		}
-	}
-
-	//Run scanline with threads
-	const int threadCount = std::thread::hardware_concurrency();
-	std::vector<std::future<std::vector<Vector2>>> threads;
-	float portion = (yMax - yMin) / threadCount;		
-	float currentY = yMin;
-	for (int i = 0; i < threadCount; i++)
-	{
-		threads.push_back(std::async(scanline, verts, currentY, currentY + portion, xMin, xMax));
-		currentY += portion;
-	}
-	for (int i = 0; i < threadCount; i++)
-	{
-		std::vector<Vector2> newPoints = threads[i].get();
-		points.insert(points.begin(), newPoints.begin(), newPoints.end());
-	}
-	
-
-	//Add horizontal outlines
-	int i = 0;
-	int j = verts.size() - 1;
-	float x1, x2, min, max;
-	for (i = 0; i < verts.size(); i++)
-	{
-		if ((verts[i].y == verts[j].y))
-		{
-			x1 = verts[i].x; x2 = verts[j].x;
-			min = std::min(x1, x2); max = std::max(x1, x2);
-			for (int x = min; x <= max; x++)
-			{
-				points.push_back(Vector2(x, verts[i].y));
-			}
-		}
-		j = i;
-	}
-
-	return points;
-}
-//Scanline
-std::vector<ME_Vector2> MaximumEngine::Algorithm::scanline(std::vector<Vector2> verts, float yMin, float yMax, float xMin, float xMax)
-{
-	std::vector<Vector2> points;
 	std::vector<float> inter;
 	int i, j;
 	float x;
@@ -212,6 +117,167 @@ std::vector<ME_Vector2> MaximumEngine::Algorithm::scanline(std::vector<Vector2> 
 		}
 		//Clear intersections;
 		inter.clear();
+	}
+
+	//Add horizontal outlines
+	i = 0;
+	j = verts.size() - 1;
+	float x1, x2, min, max;
+	for (i = 0; i < verts.size(); i++)
+	{
+		if ((verts[i].y == verts[j].y))
+		{
+			x1 = verts[i].x; x2 = verts[j].x;
+			min = std::min(x1, x2); max = std::max(x1, x2);
+			for (int x = min; x <= max; x++)
+			{
+				points.push_back(Vector2(x, verts[i].y));
+			}
+		}
+		j = i;
+	}
+
+	return points;
+}
+std::vector<ME_Vector2> MaximumEngine::Algorithm::fillPolygonEdgeBucket(std::vector<Vector2> verts)
+{
+	std::vector<Vector2> points;
+
+	//Get max and min y
+	float yMax = verts[0].y;
+	float yMin = verts[0].y;
+	float xMax = verts[0].x;
+	float xMin = verts[0].x;
+	for (int i = 0; i < verts.size(); i++)
+	{
+		if (verts[i].y > yMax)
+		{
+			yMax = verts[i].y;
+		}
+		if (verts[i].y < yMin)
+		{
+			yMin = verts[i].y;
+		}
+		if (verts[i].x > xMax)
+		{
+			xMax = verts[i].x;
+		}
+		if (verts[i].x < xMin)
+		{
+			xMin = verts[i].x;
+		}
+	}
+
+	//Scanline
+	std::vector<float> inter;
+	float otherVerticeY = 0;
+	bool isOtherVertice = false;
+	int i, j;
+	float x;
+	//Create edge bucket
+	std::vector<Edge> edges;
+	j = verts.size() - 1;
+	for (i = 0; i < verts.size(); i++)
+	{
+		edges.push_back(Edge(verts[j], verts[i]));
+		j = i;
+	}
+	//loop each scan line
+	for (float currentY = yMin; currentY < yMax; currentY++)
+	{
+		//Check intersections
+		for (auto it = edges.begin(); it != edges.end();)
+		{
+			if ((it->v1.y <= currentY && it->v2.y >= currentY
+			  || it->v2.y <= currentY && it->v1.y >= currentY))			
+			{
+				x = (it->v1.x + (currentY - it->v1.y) / (it->v2.y - it->v1.y) * (it->v2.x - it->v1.x));
+				//Check intersection is not on an inward edge
+				bool inwardEdge = false;
+				if (it->v1.y == currentY)
+				{
+					if (isOtherVertice)
+					{
+						if ((it->v2.y >= currentY && otherVerticeY >= currentY) || (it->v2.y <= currentY && otherVerticeY <= currentY)) inwardEdge = true;
+					}
+					else
+					{
+						otherVerticeY = it->v1.y;
+						isOtherVertice = true;
+						
+					}
+				}
+				else if (it->v2.y == currentY)
+				{
+					if (isOtherVertice)
+					{
+						if ((it->v1.y >= currentY && otherVerticeY >= currentY) || (it->v1.y <= currentY && otherVerticeY <= currentY)) inwardEdge = true;
+					}
+					else
+					{
+						otherVerticeY = it->v2.y;
+						isOtherVertice = true;
+						
+					}
+				}
+				if (!inwardEdge)
+				{
+					bool inside = false;
+					for (std::vector<float>::iterator it2 = inter.begin(); it2 != inter.end(); it2++)
+					{
+						if (*it2 == x) { inside = true; break; }
+					}
+					if (!inside) { inter.push_back(x); }
+				}
+				//Add outline points				
+				points.push_back(Vector2(x, currentY));
+				++it;
+			}
+			else if (it->v1.y < currentY && it->v2.y < currentY)
+			{
+				it = edges.erase(it);
+			}
+			else ++it;
+		}		
+		//Sort intersections		
+		sort(inter.begin(), inter.end());
+		//Add points
+		for (i = 0; i < inter.size(); i += 2)
+		{
+			if (i == inter.size() - 1) { break; }
+			if (inter[i] >= xMax) { break; }
+			if (inter[i + 1] > xMin)
+			{
+				if (inter[i] < xMin) { inter[i] = xMin; }
+				if (inter[i + 1] < xMin) { inter[i + 1] = xMax; }
+				for (x = inter[i] + 1; x < inter[i + 1]; x++)
+				{
+					//Add fill points
+					points.push_back(Vector2(x, currentY));
+				}
+			}
+		}
+		//Clear intersections;
+		inter.clear();
+		isOtherVertice = false;
+	}
+
+	//Add horizontal outlines
+	i = 0;
+	j = verts.size() - 1;
+	float x1, x2, min, max;
+	for (i = 0; i < verts.size(); i++)
+	{
+		if ((verts[i].y == verts[j].y))
+		{
+			x1 = verts[i].x; x2 = verts[j].x;
+			min = std::min(x1, x2); max = std::max(x1, x2);
+			for (int x = min; x <= max; x++)
+			{
+				points.push_back(Vector2(x, verts[i].y));
+			}
+		}
+		j = i;
 	}
 
 	return points;

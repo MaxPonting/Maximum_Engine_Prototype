@@ -27,16 +27,18 @@ namespace MaximumEngine
 		void setRotation(const float z);
 	private:
 		//METHODS
+		void update();
 		void render(SDL_Renderer* renderer);		
 		void rotate();
-		void setPoints();
-		//VARIABLES
+		void tsSetPoints();
+		//MEMBERS
 		std::vector<Vector2> vertices;
 		std::vector<Vector2> rotatedVertices;
 		std::vector<Vector2> points;
 		float rotation;	
 		Vector2 position;
 		Colour colour;
+		bool scanlineNeeded;
 		//FRIENDS
 		friend class GameObject;
 	};

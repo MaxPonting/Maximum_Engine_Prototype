@@ -9,15 +9,17 @@
 #include "Input.h"
 #include "Component.h"
 #include "Collider.h"
+#include "EngineThreadPool.h"
 #include <vector>
 
 namespace MaximumEngine
 {
-	class Engine
+	class Engine final
 	{
 	public:
 		//METHODS
 		static void init();
+		static void initWithThreading();
 		static void start();
 		static void start(int width, int height);
 	private:
@@ -44,6 +46,7 @@ namespace MaximumEngine
 //Methods
 #define ME_Engine MaximumEngine::Engine
 #define ME_Init() MaximumEngine::Engine::init()
+#define ME_Init_Threading() MaximumEngine::Engine::initWithThreading();
 #define ME_Start() MaximumEngine::Engine::start()
 #define ME_Start_With_Resolution(w, h) MaximumEngine::Engine::start(w, h)
 
