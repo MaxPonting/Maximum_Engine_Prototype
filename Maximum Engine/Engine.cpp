@@ -36,7 +36,7 @@ void MaximumEngine::Engine::start()
 	//Create Window And Renderer
 	window = SDL_CreateWindow("Maximum Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, ME_GetResolution().x, ME_GetResolution().y, SDL_WINDOW_SHOWN);
 	if (window == NULL) { ME_Error_Log(SDL_GetError()); }
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
 	if (renderer == NULL) { ME_Error_Log(SDL_GetError()); }
 
 	//Start debug

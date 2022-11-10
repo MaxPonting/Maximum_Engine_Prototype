@@ -18,6 +18,8 @@ namespace MaximumEngine
 		float getRotation() const;
 		Vector2 getPosition() const;
 		float getLargestVertice() const;
+		float getWidth() const;
+		float getHeight() const;
 		std::vector<Vector2> getVertices() const;
 		std::vector<Vector2> getRawVertices() const;
 		//SETTERS

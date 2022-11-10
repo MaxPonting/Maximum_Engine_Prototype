@@ -308,14 +308,14 @@ bool MaximumEngine::Algorithm::isCollisionPolygon(const std::vector<Vector2> ver
 	return false;
 	//Time Complexity O(n^2)
 }
-bool MaximumEngine::Algorithm::isCollisionPolygonRectangle(const float height, const float width, const std::vector<Vector2> vertices) { return false; }
-bool MaximumEngine::Algorithm::isCollisionPolygonSquare(const float size, const std::vector<Vector2> vertices) { return false; }
-bool MaximumEngine::Algorithm::isCollisionPolygonCircle(const float radius, const std::vector<Vector2> vertices) { return false; }
-bool MaximumEngine::Algorithm::isCollisionRectangle(const float height1, const float width1, const float height2, const float width2) { return false; }
-bool MaximumEngine::Algorithm::isCollisionRectangleSquare(const float height, const float width, const float size) { return false; }
-bool MaximumEngine::Algorithm::isCollisionRectangleCircle(const float height, const float width, const float radius) { return false; }
-bool MaximumEngine::Algorithm::isCollisionSquare(const float size1, const float size2) { return false; }
-bool MaximumEngine::Algorithm::isCollisionSquareCircle(const float size, const float radius) { return false; }
+bool MaximumEngine::Algorithm::isCollisionPolygonRectangle(const std::vector<Vector2> vertices, const float height, const float width, const Vector2 p1, const Vector2 p2) { return false; }
+bool MaximumEngine::Algorithm::isCollisionPolygonSquare(const std::vector<Vector2> vertices, const float size, const Vector2 p1, const Vector2 p2) { return false; }
+bool MaximumEngine::Algorithm::isCollisionPolygonCircle(const std::vector<Vector2> vertices, const float radius, const Vector2 p1, const Vector2 p2) { return false; }
+bool MaximumEngine::Algorithm::isCollisionRectangle(const float height1, const float width1, const float height2, const float width2, const Vector2 p1, const Vector2 p2) { return false; }
+bool MaximumEngine::Algorithm::isCollisionRectangleSquare(const float height, const float width, const float size, const Vector2 p1, const Vector2 p2) { return false; }
+bool MaximumEngine::Algorithm::isCollisionRectangleCircle(const float height, const float width, const float radius, const Vector2 p1, const Vector2 p2) { return false; }
+bool MaximumEngine::Algorithm::isCollisionSquare(const float size1, const float size2, const Vector2 p1, const Vector2 p2) { return false; }
+bool MaximumEngine::Algorithm::isCollisionSquareCircle(const float size, const float circle, const Vector2 p1, const Vector2 p2) { return false; }
 
 //POINT LINE INTERSECTION
 bool MaximumEngine::Algorithm::isIntersect(Vector2 p1, Vector2 q1, Vector2 p2, Vector2 q2)

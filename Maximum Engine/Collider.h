@@ -3,22 +3,34 @@
 
 namespace MaximumEngine
 {
+	class CircleCollider;
+	class SquareCollider;
+	class RectangleCollider;
+	class PolygonCollider;
 	class Collider : public Component
 	{
 	public:
 		//VARIABLES
 		bool renderOutline;
+		//GETTERS
+		std::vector<Vector2> virtual getVertices();
+		const Collider virtual getSelf();
 	protected:
 		//METHODS	
 		void virtual update(std::vector<Component*> comps, std::vector<Collider*> cols);
-		void render(SDL_Renderer* renderer);
+		void render(SDL_Renderer* renderer);		
 		void alertComponents(Collider* collider, std::vector<Component*> comps);
 		std::vector<Collider*> getCloseColliders(std::vector<Collider*> cols);
-		//GETTERS
-		std::vector<Vector2> virtual getVertices();
+		//COLLISON CHECKING
+		bool virtual isCollision(Collider collider);
+		bool virtual isCollision(PolygonCollider collider);
+		bool virtual isCollision(RectangleCollider collider);
+		bool virtual isCollision(SquareCollider collider);
+		bool virtual isCollision(CircleCollider collider);
+		//GETTERS		
 		float virtual getLargestVertice();
 	private:
-		//METHODS
+		//METHODS	
 		bool doIntersect(Vector2 p1, Vector2 q1, Vector2 p2, Vector2 q2);
 		int lineOrientation(Vector2 p, Vector2 q, Vector2 r);
 		bool onLineSegment(Vector2 p, Vector2 q, Vector2 r);
@@ -48,6 +60,13 @@ namespace MaximumEngine
 	public:
 		//VARIABLES
 		float height, width;
+	protected:
+		//COLLISON CHECKING
+		bool virtual isCollision(Collider collider);
+		bool virtual isCollision(PolygonCollider collider);
+		bool virtual isCollision(RectangleCollider collider);
+		bool virtual isCollision(SquareCollider collider);
+		bool virtual isCollision(CircleCollider collider);
 	};
 
 	class SquareCollider : public Collider
@@ -55,6 +74,13 @@ namespace MaximumEngine
 	public:
 		//VARIABLES
 		float size;
+	protected:
+		//COLLISON CHECKING
+		bool virtual isCollision(Collider collider);
+		bool virtual isCollision(PolygonCollider collider);
+		bool virtual isCollision(RectangleCollider collider);
+		bool virtual isCollision(SquareCollider collider);
+		bool virtual isCollision(CircleCollider collider);
 	};
 
 	class CircleCollider : public Collider
@@ -64,8 +90,15 @@ namespace MaximumEngine
 		float radius;
 	protected:
 		//METHODS
-		void update(std::vector<Component*> comps, std::vector<Collider*> cols);
+		void start();
+		//GETTERS
 		float getLargestVertice();
+		//COLLISON CHECKING
+		bool virtual isCollision(Collider collider);
+		bool virtual isCollision(PolygonCollider collider);
+		bool virtual isCollision(RectangleCollider collider);
+		bool virtual isCollision(SquareCollider collider);
+		bool virtual isCollision(CircleCollider collider);
 	};
 }
 

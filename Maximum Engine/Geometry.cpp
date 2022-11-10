@@ -5,6 +5,7 @@
 #include "Screen.h"
 #include "Algorithm.h"
 #include "EngineThreadPool.h"
+#include "Timer.h"
 
 
 //CONSTRUCTOR
@@ -52,14 +53,13 @@ void MaximumEngine::Geometry::render(SDL_Renderer* renderer)
 	//Set Draw Colour
 	SDL_SetRenderDrawColor(renderer, colour.getR(), colour.getG(), colour.getB(), colour.getA());
 
-	//Render points
 	const int size = points.size();
-	SDL_Point *drawPoints = new SDL_Point[size];
+	SDL_FPoint* drawPoints = new SDL_FPoint[size];
 	for (int i = 0; i < size; i++)
-	{		
-	    drawPoints[i] = { (int)(points[i].x + position.x), (int)(points[i].y + position.y) };		
+	{
+		drawPoints[i] = { points[i].x + position.x, points[i].y + position.y };
 	}
-	SDL_RenderDrawPoints(renderer, drawPoints, size);
+	SDL_RenderDrawPointsF(renderer, drawPoints, size);
 	delete[] drawPoints;
 }
 void MaximumEngine::Geometry::rotate()
@@ -100,6 +100,28 @@ float MaximumEngine::Geometry::getLargestVertice() const
 ME_Vector2 MaximumEngine::Geometry::getPosition() const
 {
 	return position;
+}
+float MaximumEngine::Geometry::getWidth() const
+{
+	float maxX = 0; float minX = 0;
+	for (int i = 0; i < rotatedVertices.size(); i++)
+	{
+		if (rotatedVertices[i].x > maxX) maxX = rotatedVertices[i].x;
+		if (rotatedVertices[i].x < minX) minX = rotatedVertices[i].x;
+	}
+
+	return maxX - minX;
+}
+float MaximumEngine::Geometry::getHeight() const
+{
+	float maxY = 0; float minY = 0;
+	for (int i = 0; i < rotatedVertices.size(); i++)
+	{
+		if (rotatedVertices[i].y > maxY) maxY = rotatedVertices[i].y;
+		if (rotatedVertices[i].y < minY) minY = rotatedVertices[i].y;
+	}
+
+	return maxY - minY;
 }
 std::vector<ME_Vector2> MaximumEngine::Geometry::getVertices() const
 {
