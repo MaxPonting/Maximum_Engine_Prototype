@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+#include "Angle.h"
 
 namespace MaximumEngine
 {
@@ -11,24 +12,28 @@ namespace MaximumEngine
 	{
 	public:
 		//VARIABLES
-		bool renderOutline;
+		bool renderOutline = true;
 		//GETTERS
 		std::vector<Vector2> virtual getVertices();
-		const Collider virtual getSelf();
+		std::vector<Vector2> virtual getRotatedVertices();
+		float getRotation();	
+		//SETTERS
+		void setRotation(float z);
 	protected:
 		//METHODS	
 		void virtual update(std::vector<Component*> comps, std::vector<Collider*> cols);
-		void render(SDL_Renderer* renderer);		
+		void virtual render(SDL_Renderer* renderer);		
 		void alertComponents(Collider* collider, std::vector<Component*> comps);
-		std::vector<Collider*> getCloseColliders(std::vector<Collider*> cols);
+		std::vector<Collider*> getCloseColliders(std::vector<Collider*> cols);		
 		//COLLISON CHECKING
 		bool virtual isCollision(Collider collider);
 		bool virtual isCollision(PolygonCollider collider);
 		bool virtual isCollision(RectangleCollider collider);
-		bool virtual isCollision(SquareCollider collider);
 		bool virtual isCollision(CircleCollider collider);
 		//GETTERS		
 		float virtual getLargestVertice();
+		//MEMBERS
+		Angle rotation;
 	private:
 		//METHODS	
 		bool doIntersect(Vector2 p1, Vector2 q1, Vector2 p2, Vector2 q2);
@@ -41,18 +46,15 @@ namespace MaximumEngine
 	public:
 		//GETTERS
 		std::vector<Vector2> getVertices();
+		std::vector<Vector2> virtual getRotatedVertices();
+		float virtual getLargestVertice();
 		//SETTERS
 		void setVertices(std::vector<Vector2> v);
 	protected:
 		//METHODS
-		void start();
-		void rotate(float z);
-		//GETTERS
-		float virtual getLargestVertice();
-	private:
-		//VARIABLES
+		void start();		
+		//VARIABLES		
 		std::vector<Vector2> vertices;
-		std::vector<Vector2> rotatedVertices;
 	};
 
 	class RectangleCollider : public Collider
@@ -60,26 +62,15 @@ namespace MaximumEngine
 	public:
 		//VARIABLES
 		float height, width;
+		//GETTERS
+		std::vector<Vector2> virtual getRotatedVertices();
 	protected:
+		//METHODS
+		void start();	
 		//COLLISON CHECKING
 		bool virtual isCollision(Collider collider);
 		bool virtual isCollision(PolygonCollider collider);
 		bool virtual isCollision(RectangleCollider collider);
-		bool virtual isCollision(SquareCollider collider);
-		bool virtual isCollision(CircleCollider collider);
-	};
-
-	class SquareCollider : public Collider
-	{
-	public:
-		//VARIABLES
-		float size;
-	protected:
-		//COLLISON CHECKING
-		bool virtual isCollision(Collider collider);
-		bool virtual isCollision(PolygonCollider collider);
-		bool virtual isCollision(RectangleCollider collider);
-		bool virtual isCollision(SquareCollider collider);
 		bool virtual isCollision(CircleCollider collider);
 	};
 
@@ -97,7 +88,6 @@ namespace MaximumEngine
 		bool virtual isCollision(Collider collider);
 		bool virtual isCollision(PolygonCollider collider);
 		bool virtual isCollision(RectangleCollider collider);
-		bool virtual isCollision(SquareCollider collider);
 		bool virtual isCollision(CircleCollider collider);
 	};
 }

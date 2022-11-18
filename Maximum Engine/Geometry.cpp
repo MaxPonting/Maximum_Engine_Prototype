@@ -7,7 +7,6 @@
 #include "EngineThreadPool.h"
 #include "Timer.h"
 
-
 //CONSTRUCTOR
 MaximumEngine::Geometry::Geometry() :position(Vector2(10, 10)), rotation(0), colour(Colour())
 {
@@ -69,8 +68,8 @@ void MaximumEngine::Geometry::rotate()
 	for (int i = 0; i < vertices.size(); i++)
 	{
 		Vector2 rotatedVector;
-		rotatedVector.x = vertices[i].x * cos(rotation) - sin(rotation) * vertices[i].y;
-		rotatedVector.y = vertices[i].x * sin(rotation) + cos(rotation) * vertices[i].y;
+		rotatedVector.x = vertices[i].x * cos(rotation.getRad()) - sin(rotation.getRad()) * vertices[i].y;
+		rotatedVector.y = vertices[i].x * sin(rotation.getRad()) + cos(rotation.getRad()) * vertices[i].y;
 		rotatedVertices.push_back(rotatedVector);
 	}
 }
@@ -82,7 +81,7 @@ void MaximumEngine::Geometry::tsSetPoints()
 //GETTERS
 float MaximumEngine::Geometry::getRotation() const
 {
-	return rotation;
+	return rotation.getDeg();
 }
 float MaximumEngine::Geometry::getLargestVertice() const
 {
@@ -104,10 +103,10 @@ ME_Vector2 MaximumEngine::Geometry::getPosition() const
 float MaximumEngine::Geometry::getWidth() const
 {
 	float maxX = 0; float minX = 0;
-	for (int i = 0; i < rotatedVertices.size(); i++)
+	for (int i = 0; i < vertices.size(); i++)
 	{
-		if (rotatedVertices[i].x > maxX) maxX = rotatedVertices[i].x;
-		if (rotatedVertices[i].x < minX) minX = rotatedVertices[i].x;
+		if (vertices[i].x > maxX) maxX = vertices[i].x;
+		if (vertices[i].x < minX) minX = vertices[i].x;
 	}
 
 	return maxX - minX;
@@ -115,10 +114,10 @@ float MaximumEngine::Geometry::getWidth() const
 float MaximumEngine::Geometry::getHeight() const
 {
 	float maxY = 0; float minY = 0;
-	for (int i = 0; i < rotatedVertices.size(); i++)
+	for (int i = 0; i < vertices.size(); i++)
 	{
-		if (rotatedVertices[i].y > maxY) maxY = rotatedVertices[i].y;
-		if (rotatedVertices[i].y < minY) minY = rotatedVertices[i].y;
+		if (vertices[i].y > maxY) maxY = vertices[i].y;
+		if (vertices[i].y < minY) minY = vertices[i].y;
 	}
 
 	return maxY - minY;
@@ -145,7 +144,6 @@ void MaximumEngine::Geometry::setVertices(const std::vector<Vector2> verts)
 }
 void MaximumEngine::Geometry::setRotation(const float z)
 {
-	float rotationChange = rotation - z;
 	rotation = z;
 	rotate();
 	scanlineNeeded = true;

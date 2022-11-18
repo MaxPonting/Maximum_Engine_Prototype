@@ -39,7 +39,6 @@ namespace MaximumEngine
 		void render(SDL_Renderer* renderer);	
 		void update(std::vector<Collider*> cols);
 		void updateGeometry();
-		void rotateComponents(float z);
 		//VARIABLES
 		Geometry geometry;
 		std::vector<Component*> components;

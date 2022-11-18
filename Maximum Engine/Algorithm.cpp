@@ -286,36 +286,100 @@ std::vector<ME_Vector2> MaximumEngine::Algorithm::fillPolygonEdgeBucket(std::vec
 //COLLISION DETECTION
 bool MaximumEngine::Algorithm::isCollisionPolygon(const std::vector<Vector2> verts1, const std::vector<Vector2> verts2, const Vector2 p1, const Vector2 p2)
 {
-	//Checks if any edges intersect
-	int j1 = verts1.size() - 1;
-	for (int c1 = 0; c1 < verts1.size(); c1++)
+	//Seperating Axis
+	//Vector of each edge
+	std::vector<Edge> edges;
+	int j = verts1.size() - 1;
+	for (int i = 0; i < verts1.size(); i++)
 	{
-		int j2 = verts2.size() - 1;
-		for (int c2 = 0; c2 < verts2.size(); c2++)
-		{
-			Vector2 point1 = p1 + verts1[j1];
-			Vector2 point2 = p1 + verts1[c1];
-			Vector2 point3 = p2 + verts2[j2];
-			Vector2 point4 = p2 + verts2[c2];
-			if (isIntersect(point1, point2, point3, point4))
-			{
-				return true;
-			}
-			j2 = c2;
-		}
-		j1 = c1;
+		edges.push_back(Edge(verts1[j], verts1[i]));
+		j = i;
 	}
-	return false;
+	j = verts2.size() - 1;
+	for (int i = 0; i < verts2.size(); i++)
+	{
+		edges.push_back(Edge(verts2[j], verts2[i]));
+		j = i;
+	}
+	//Get heading
+	Vector2 heading = p1 - p2;
+	//Loop over vector of edges
+	for (int i1 = 0; i1 < edges.size(); i1++)
+	{
+		//Get axis
+		Vector2 axis = Vector2(-(edges[i1].v2.y - edges[i1].v1.y), edges[i1].v2.x - edges[i1].v1.x).getNormalization();
+
+		//Project edges onto axis
+		//Polygon 1
+		float p1min = axis * verts1[0];
+		float p1max = p1min;
+		for (int i2 = 1; i2 < verts1.size(); i2++)
+		{
+			float dot = axis * verts1[i2];
+			p1min = fminf(p1min, dot);
+			p1max = fmaxf(p1max, dot);
+		}
+		//Polygon 2
+		float p2min = axis * verts2[0];
+		float p2max = p2min;
+		for (int i2 = 0; i2 < verts2.size(); i2++)
+		{
+			float dot = axis * verts2[i2];
+			p2min = fminf(p2min, dot);
+			p2max = fmaxf(p2max, dot);
+		}
+
+		//Apply offset
+		float offset = axis * heading;
+		p1min += offset;
+		p1max += offset;
+
+		//Check for overlap
+		if (p1min - p2max > 0 || p2min - p1max > 0) return false;
+
+		//Set j to i
+		j = i1;
+	}
+	return true;
 	//Time Complexity O(n^2)
 }
-bool MaximumEngine::Algorithm::isCollisionPolygonRectangle(const std::vector<Vector2> vertices, const float height, const float width, const Vector2 p1, const Vector2 p2) { return false; }
-bool MaximumEngine::Algorithm::isCollisionPolygonSquare(const std::vector<Vector2> vertices, const float size, const Vector2 p1, const Vector2 p2) { return false; }
-bool MaximumEngine::Algorithm::isCollisionPolygonCircle(const std::vector<Vector2> vertices, const float radius, const Vector2 p1, const Vector2 p2) { return false; }
-bool MaximumEngine::Algorithm::isCollisionRectangle(const float height1, const float width1, const float height2, const float width2, const Vector2 p1, const Vector2 p2) { return false; }
-bool MaximumEngine::Algorithm::isCollisionRectangleSquare(const float height, const float width, const float size, const Vector2 p1, const Vector2 p2) { return false; }
-bool MaximumEngine::Algorithm::isCollisionRectangleCircle(const float height, const float width, const float radius, const Vector2 p1, const Vector2 p2) { return false; }
-bool MaximumEngine::Algorithm::isCollisionSquare(const float size1, const float size2, const Vector2 p1, const Vector2 p2) { return false; }
-bool MaximumEngine::Algorithm::isCollisionSquareCircle(const float size, const float circle, const Vector2 p1, const Vector2 p2) { return false; }
+bool MaximumEngine::Algorithm::isCollisionPolygonCircle(const std::vector<Vector2> vertices, const float radius, const Vector2 p1, const Vector2 p2) 
+{ 
+	//Find closest vertice
+	Vector2 closestVert = vertices[0];
+	for (int i = 1; i < vertices.size(); i++)
+	{
+		float distance = (closestVert + p1 - p2).getMagnitude();
+		if (distance > (vertices[i] + p1 - p2).getMagnitude()) closestVert = vertices[i];
+	}
+
+	//Set axis
+
+
+	return false; 
+}
+bool MaximumEngine::Algorithm::isCollisionRectangle(const float height1, const float width1, const float height2, const float width2, const Vector2 p1, const Vector2 p2) 
+{ 
+	if (abs(p1.x - p2.x) >= (width1 / 2 + width2 / 2)) return false;
+	if (abs(p1.y - p2.y) >= (height1 / 2 + height2 / 2)) return false;
+	
+	return true;
+}
+bool MaximumEngine::Algorithm::isCollisionRectangleCircle(const float height, const float width, const float radius, const Vector2 p1, const Vector2 p2) 
+{ 
+	float xDistance = abs(p2.x - p1.x);
+	float yDistance = abs(p2.y - p2.y);
+	
+	if (xDistance > width / 2 + radius) return true;
+	if (yDistance > height / 2 + radius) return true;
+
+	if (xDistance <= width / 2) return true;
+	if (xDistance <= width / 2) return true;
+		
+	float cornerDistance = sqrt(xDistance - width / 2) + sqrt(yDistance - height / 2);
+	
+	return cornerDistance <= sqrt(radius); 
+}
 
 //POINT LINE INTERSECTION
 bool MaximumEngine::Algorithm::isIntersect(Vector2 p1, Vector2 q1, Vector2 p2, Vector2 q2)

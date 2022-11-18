@@ -156,6 +156,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Algorithm.cpp" />
+    <ClCompile Include="Angle.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="Colour.cpp" />
     <ClCompile Include="Component.cpp" />
@@ -175,6 +176,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Algorithm.h" />
+    <ClInclude Include="Angle.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="Colour.h" />
     <ClInclude Include="Component.h" />

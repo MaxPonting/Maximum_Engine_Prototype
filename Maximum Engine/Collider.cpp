@@ -21,10 +21,6 @@ void MaximumEngine::Collider::update(std::vector<Component*> comps, std::vector<
 		{
 			if (isCollision(*dynamic_cast<MaximumEngine::RectangleCollider*>(closeColliders[i]))) alertComponents(closeColliders[i], comps);
 		}
-		else if (dynamic_cast<MaximumEngine::SquareCollider*>(closeColliders[i]))
-		{
-			if (isCollision(*dynamic_cast<MaximumEngine::SquareCollider*>(closeColliders[i]))) alertComponents(closeColliders[i], comps);
-		}
 		else if (dynamic_cast<MaximumEngine::CircleCollider*>(closeColliders[i]))
 		{
 			if (isCollision(*dynamic_cast<MaximumEngine::CircleCollider*>(closeColliders[i]))) alertComponents(closeColliders[i], comps);
@@ -41,7 +37,7 @@ void MaximumEngine::Collider::render(SDL_Renderer* renderer)
 	if (!renderOutline) { return; }
 	//Render Outline Of Collider in Green
 	SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-	std::vector<Vector2> vertices = getVertices();
+	std::vector<Vector2> vertices = getRotatedVertices();
 	int j = vertices.size() - 1;
 	for (int i = 0; i < vertices.size(); i++)
 	{
@@ -106,34 +102,49 @@ bool MaximumEngine::Collider::onLineSegment(Vector2 p, Vector2 q, Vector2 r)
 //Collison Checking
 bool MaximumEngine::Collider::isCollision(Collider collider)
 {
-	return Algorithm::isCollisionPolygon(getVertices(), collider.getVertices(), G_POS, collider.G_POS);
+	return Algorithm::isCollisionPolygon(getRotatedVertices(), collider.getRotatedVertices(), G_POS, collider.G_POS);
 }
 bool MaximumEngine::Collider::isCollision(PolygonCollider collider)
 {
-	return Algorithm::isCollisionPolygon(getVertices(), collider.getVertices(), G_POS, collider.G_POS);
+	return Algorithm::isCollisionPolygon(getRotatedVertices(), collider.getRotatedVertices(), G_POS, collider.G_POS);
 }
 bool MaximumEngine::Collider::isCollision(RectangleCollider collider)
 {
-	return Algorithm::isCollisionPolygonRectangle(getVertices(), collider.height, collider.width, G_POS, collider.G_POS);
-}
-bool MaximumEngine::Collider::isCollision(SquareCollider collider)
-{
-	return Algorithm::isCollisionPolygonSquare(getVertices(), collider.size, G_POS, collider.G_POS);
+	return Algorithm::isCollisionPolygon(getVertices(), collider.getRotatedVertices(), G_POS, collider.G_POS);
 }
 bool MaximumEngine::Collider::isCollision(CircleCollider collider)
 {
-	return Algorithm::isCollisionPolygonCircle(getVertices(), collider.radius, G_POS, collider.G_POS);
+	return Algorithm::isCollisionPolygonCircle(getRotatedVertices(), collider.radius, G_POS, collider.G_POS);
 }
 //Getters
 std::vector<ME_Vector2> MaximumEngine::Collider::getVertices()
 {
 	return getGeometry().getVertices();
 }
+std::vector<ME_Vector2> MaximumEngine::Collider::getRotatedVertices()
+{
+	std::vector<Vector2> rotatedVerts;
+	for (int i = 0; i < G_VERT.size(); i++)
+	{
+		Angle angle = G_ROT + rotation.getDeg();
+		rotatedVerts.push_back(G_VERT[i].getRotate((rotation + G_ROT).getDeg()));
+	}
+	return rotatedVerts;
+}
 float MaximumEngine::Collider::getLargestVertice()
 {
 	return getGeometry().getLargestVertice();
 }
-const MaximumEngine::Collider MaximumEngine::Collider::getSelf() { return *this; }
+float MaximumEngine::Collider::getRotation()
+{
+	return rotation.getDeg();
+}
+//Setters
+void MaximumEngine::Collider::setRotation(float z)
+{
+	rotation = z;
+}
+
 
 //POLYGON COLLIDER
 //Methods
@@ -142,22 +153,19 @@ void MaximumEngine::PolygonCollider::start()
 	//Set default vertices to match geometry
 	vertices = getGeometry().getVertices();
 }
-void MaximumEngine::PolygonCollider::rotate(float z)
-{
-	rotatedVertices.clear();
-	//Rotate each vertice
-	for (int i = 0; i < vertices.size(); i++)
-	{
-		Vector2 rotatedVector;
-		rotatedVector.x = vertices[i].x * cos(rotation) - sin(rotation) * vertices[i].y;
-		rotatedVector.y = vertices[i].x * sin(rotation) + cos(rotation) * vertices[i].y;
-		rotatedVertices.push_back(rotatedVector);
-	}
-}
 //Getters
 std::vector<ME_Vector2> MaximumEngine::PolygonCollider::getVertices()
 {
 	return vertices;
+}
+std::vector<ME_Vector2> MaximumEngine::PolygonCollider::getRotatedVertices()
+{
+	std::vector<Vector2> rotatedVerts;
+	for (int i = 0; i < vertices.size(); i++)
+	{
+		rotatedVerts.push_back(vertices[i].getRotate((rotation + G_ROT).getDeg()));
+	}
+	return rotatedVerts;
 }
 float MaximumEngine::PolygonCollider::getLargestVertice()
 {
@@ -178,51 +186,52 @@ void MaximumEngine::PolygonCollider::setVertices(std::vector<Vector2> v)
 	vertices = v;
 }
 
+
 //RECTANGLE COLLIDER
+//Methods
+void MaximumEngine::RectangleCollider::start()
+{
+	width = getGeometry().getWidth();
+	height = getGeometry().getHeight();
+}
 //Collison Checking
 bool MaximumEngine::RectangleCollider::isCollision(Collider collider)
 {
-	return Algorithm::isCollisionPolygonRectangle(collider.getVertices(), height, width, collider.G_POS, G_POS);
+	return Algorithm::isCollisionPolygon(collider.getRotatedVertices(), getRotatedVertices(), collider.G_POS, G_POS);
 }
 bool MaximumEngine::RectangleCollider::isCollision(PolygonCollider collider)
 {
-	return Algorithm::isCollisionPolygonRectangle(collider.getVertices(), height, width, collider.G_POS, G_POS);
+	return Algorithm::isCollisionPolygon(collider.getRotatedVertices(), collider.getRotatedVertices(), collider.G_POS, G_POS);
 }
 bool MaximumEngine::RectangleCollider::isCollision(RectangleCollider collider)
 {
+	//AXIS ALIGNED
+	if(rotation + G_ROT == collider.getRotation() + collider.G_ROT)
 	return Algorithm::isCollisionRectangle(height, width, collider.height, collider.width, G_POS, collider.G_POS);
-}
-bool MaximumEngine::RectangleCollider::isCollision(SquareCollider collider)
-{
-	return Algorithm::isCollisionRectangleSquare(height, width, collider.size, G_POS, collider.G_POS);
+	
+	//NOT ALIGNED
+	return Algorithm::isCollisionPolygon(getRotatedVertices(), collider.getRotatedVertices(), G_POS, collider.G_POS);
 }
 bool MaximumEngine::RectangleCollider::isCollision(CircleCollider collider)
 {
+	//AXIS ALIGNED
+	if ((rotation + G_ROT).getDeg() == 0)
 	return Algorithm::isCollisionRectangleCircle(height, width, collider.radius, G_POS, collider.G_POS);
+
+	//NOT ALIGNED
+	return Algorithm::isCollisionPolygonCircle(getRotatedVertices(), collider.radius, G_POS, collider.G_POS);
+}
+//Getters
+std::vector<ME_Vector2> MaximumEngine::RectangleCollider::getRotatedVertices()
+{	
+	float rad = (rotation + G_ROT).getRad();
+	return 
+	{
+		Vector2(width / 2, height / 2).getRotate(rad), Vector2(-width / 2, height / 2).getRotate(rad),
+		Vector2(-width / 2, -height / 2).getRotate(rad), Vector2(width / 2, -height / 2).getRotate(rad)
+	};
 }
 
-//SQUARE COLLIDER
-//Collision Checking
-bool MaximumEngine::SquareCollider::isCollision(Collider collider)
-{
-	return Algorithm::isCollisionPolygonSquare(collider.getVertices(), size, collider.G_POS, G_POS);
-}
-bool MaximumEngine::SquareCollider::isCollision(PolygonCollider collider)
-{
-	return Algorithm::isCollisionPolygonSquare(collider.getVertices(), size, collider.G_POS, G_POS);
-}
-bool MaximumEngine::SquareCollider::isCollision(RectangleCollider collider)
-{
-	return Algorithm::isCollisionRectangleSquare(collider.height, collider.width, size, collider.G_POS, G_POS);
-}
-bool MaximumEngine::SquareCollider::isCollision(SquareCollider collider)
-{
-	return Algorithm::isCollisionSquare(size, collider.size, G_POS, collider.G_POS);
-}
-bool MaximumEngine::SquareCollider::isCollision(CircleCollider collider)
-{
-	return Algorithm::isCollisionSquareCircle(size, collider.radius, G_POS, collider.G_POS);
-}
 
 //CIRCLE COLLIDER
 //Methods
@@ -230,29 +239,30 @@ void MaximumEngine::CircleCollider::start()
 {
 	radius = getGeometry().getLargestVertice();
 }
-//Getters
-float MaximumEngine::CircleCollider::getLargestVertice()
-{
-	return radius;
-}
 //Collison Checking
 bool MaximumEngine::CircleCollider::isCollision(Collider collider)
 {
-	return Algorithm::isCollisionPolygonCircle(collider.getVertices(), radius, collider.G_POS, G_POS);
+	return Algorithm::isCollisionPolygonCircle(collider.getRotatedVertices(), radius, collider.G_POS, G_POS);
 }
 bool MaximumEngine::CircleCollider::isCollision(PolygonCollider collider)
 {
-	return Algorithm::isCollisionPolygonCircle(collider.getVertices(), radius, collider.G_POS, G_POS);
+	return Algorithm::isCollisionPolygonCircle(collider.getRotatedVertices(), radius, collider.G_POS, G_POS);
 }
 bool MaximumEngine::CircleCollider::isCollision(RectangleCollider collider)
 {
+	//AXIS ALIGNED
+	if (collider.getRotation() + collider.G_ROT == 0)
 	return Algorithm::isCollisionRectangleCircle(collider.height, collider.width, radius, collider.G_POS, G_POS);
-}
-bool MaximumEngine::CircleCollider::isCollision(SquareCollider collider)
-{
-	return Algorithm::isCollisionSquareCircle(collider.size, radius, collider.G_POS, G_POS);
+
+	//NOT ALIGNED
+	return Algorithm::isCollisionPolygonCircle(collider.getRotatedVertices(), radius, collider.G_POS, G_POS);
 }
 bool MaximumEngine::CircleCollider::isCollision(CircleCollider collider)
 {
 	return radius + collider.radius <= (G_POS - collider.G_POS).getMagnitude();
+}
+//Getters
+float MaximumEngine::CircleCollider::getLargestVertice()
+{
+	return radius;
 }

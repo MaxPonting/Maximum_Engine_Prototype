@@ -23,14 +23,17 @@ namespace MaximumEngine
 		void virtual update() {}
 		void virtual update(std::vector<Component*> comps, std::vector<Collider*> cols) {};
 		void virtual render(SDL_Renderer* renderer) {}		
-		void virtual onCollision(Collider* collider) {}
+		void virtual onCollision(const Collider* collider) {}
+		/*
+		void virtual onCollisionEnter(const Collider* collider) {}
+		void virtual onCollisionStay(const Collider* collider) {}
+		void virtual onCollisionExit(const Collider* collider) {}
+		*/
 		void virtual rotate(float z) {};
 		//ACCESS TO GEOMETRY
 		//Setters
 		void setGPosition(const Vector2 pos);
 		void setGRotation(const float z);
-		//VARIABLES
-		float rotation;		
 	private:
 		//VARIABLES
 		GameObject* gameObject;

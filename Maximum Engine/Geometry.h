@@ -3,6 +3,7 @@
 #include "Vector2.h"
 #include "Screen.h"
 #include "Colour.h"
+#include "Angle.h"
 #include <math.h>
 #include <vector>
 
@@ -37,7 +38,7 @@ namespace MaximumEngine
 		std::vector<Vector2> vertices;
 		std::vector<Vector2> rotatedVertices;
 		std::vector<Vector2> points;
-		float rotation;	
+		Angle rotation;	
 		Vector2 position;
 		Colour colour;
 		bool scanlineNeeded;
